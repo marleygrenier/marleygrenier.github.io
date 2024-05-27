@@ -39,3 +39,151 @@
       padding: 10px;
       width: 100%;
       box-sizing: border-box;
+      border: none;
+      border-bottom: 2px solid #007bff;
+      outline: none;
+      background-color: transparent;
+      color: #333;
+      text-align: center;
+    }
+    #timer {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    #result {
+      font-size: 24px;
+      text-align: center;
+      color: #007bff;
+      margin-top: 20px;
+    }
+    .next-words {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    .next-word {
+      display: inline-block;
+      margin: 0 5px;
+      color: #333;
+    }
+    .highlight {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Type Racer Game</h1>
+    <div id="word-display"></div>
+    <input type="text" id="input-field" placeholder="Start typing...">
+    <div id="timer">Time left: <span id="time-left">60</span> seconds</div>
+    <div id="result"></div>
+    <div class="next-words" id="next-words"></div>
+  </div>
+
+  <script>
+    let words = ["mai", "lundi", "avoir", "masculin", "etre", "dimanche"]; // Add more words as needed
+    let currentWordIndex = 0;
+    let startTime;
+    let endTime;
+    let timerInterval;
+    let wordsTyped = 0;
+
+    function startGame() {
+      shuffleArray(words); // Shuffle the words array
+      currentWordIndex = 0; // Reset currentWordIndex
+      startTime = new Date();
+      showWord();
+      showNextWords();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function showWord() {
+      const word = words[currentWordIndex];
+      const wordDisplay = document.getElementById('word-display');
+      wordDisplay.textContent = '';
+      word.split('').forEach((letter, index) => {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.classList.add('letter');
+        wordDisplay.appendChild(span);
+      });
+    }
+
+    function updateTimer() {
+      const currentTime = new Date();
+      const elapsedTime = (currentTime - startTime) / 1000;
+      let timeLeft = 60 - Math.floor(elapsedTime);
+      if (timeLeft < 0) {
+        timeLeft = 0;
+      }
+      document.getElementById('time-left').textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        endGame();
+      }
+    }
+
+    function endGame() {
+      endTime = new Date();
+      const elapsedTime = (endTime - startTime) / 60 / 1000; // minutes
+      const wordsPerMinute = Math.floor(wordsTyped / elapsedTime);
+      document.getElementById('result').textContent = `Time's up! Your speed: ${wordsPerMinute} WPM`;
+      document.getElementById('input-field').disabled = true;
+    }
+
+    function showNextWords() {
+      const nextWordsContainer = document.getElementById('next-words');
+      nextWordsContainer.innerHTML = 'Upcoming words: ';
+      for (let i = 1; i <= 3; i++) {
+        const nextIndex = (currentWordIndex + i) % words.length;
+        const span = document.createElement('span');
+        span.textContent = words[nextIndex];
+        span.classList.add('next-word');
+        nextWordsContainer.appendChild(span);
+      }
+    }
+
+    document.getElementById('input-field').addEventListener('input', function(event) {
+      const typedWord = event.target.value.trim();
+      const currentWord = words[currentWordIndex];
+      const typedLetters = typedWord.split('');
+      const wordLetters = currentWord.split('');
+
+      wordLetters.forEach((letter, index) => {
+        const typedLetter = typedLetters[index];
+        const letterSpan = document.querySelector(`#word-display .letter:nth-child(${index + 1})`);
+        if (typedLetter === undefined) {
+          letterSpan.classList.remove('highlight');
+        } else if (typedLetter === letter) {
+          letterSpan.classList.add('highlight');
+        } else {
+          letterSpan.classList.remove('highlight');
+        }
+      });
+
+      if (typedWord === currentWord) {
+        currentWordIndex = (currentWordIndex + 1) % words.length;
+        wordsTyped++;
+        event.target.value = '';
+        showWord();
+        showNextWords();
+      }
+    });
+
+    startGame();
+
+  </script>
+</body>
+</html>
