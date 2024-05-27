@@ -100,7 +100,39 @@
       showNextWord();
       timerInterval = setInterval(updateTimer, 1000);
       gameRunning = true;
+      document.getElementById('input-field').disabled = false; // Ensure input field is enabled
       document.getElementById('replay-button').disabled = true;
+    }
+
+    function endGame() {
+      endTime = new Date();
+      const elapsedTime = (endTime - startTime) / 60 / 1000; // minutes
+      const wordsPerMinute = Math.floor(wordsTyped / elapsedTime);
+      document.getElementById('result').textContent = `Le temps est écoulé ! Votre vitesse : ${wordsPerMinute} MPM`;
+      document.getElementById('input-field').disabled = true;
+      gameRunning = false;
+      document.getElementById('replay-button').disabled = false;
+      saveScore(wordsPerMinute);
+      updateScoresUI();
+    }
+
+    function saveScore(score) {
+      previousScores.push(score);
+      previousScores.sort((a, b) => b - a); // Sort scores in descending order
+      if (previousScores.length > 5) {
+        previousScores.pop(); // Keep only top 5 scores
+      }
+    }
+
+    function updateScoresUI() {
+      const previousScoresList = document.getElementById('previous-scores');
+      previousScoresList.innerHTML = '';
+      previousScores.forEach(score => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${score} MPM`;
+        previousScoresList.appendChild(listItem);
+      });
+      document.getElementById('best-score').textContent = previousScores.length > 0 ? previousScores[0] : 0;
     }
 
     function shuffleArray(array) {
@@ -143,37 +175,6 @@
       }
     }
 
-    function endGame() {
-      endTime = new Date();
-      const elapsedTime = (endTime - startTime) / 60 / 1000; // minutes
-      const wordsPerMinute = Math.floor(wordsTyped / elapsedTime);
-      document.getElementById('result').textContent = `Le temps est écoulé ! Votre vitesse : ${wordsPerMinute} MPM`;
-      document.getElementById('input-field').disabled = true;
-      gameRunning = false;
-      document.getElementById('replay-button').disabled = false;
-      saveScore(wordsPerMinute);
-      updateScoresUI();
-    }
-
-    function saveScore(score) {
-      previousScores.push(score);
-      previousScores.sort((a, b) => b - a); // Sort scores in descending order
-      if (previousScores.length > 5) {
-        previousScores.pop(); // Keep only top 5 scores
-      }
-    }
-
-    function updateScoresUI() {
-      const previousScoresList = document.getElementById('previous-scores');
-      previousScoresList.innerHTML = '';
-      previousScores.forEach(score => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${score} MPM`;
-        previousScoresList.appendChild(listItem);
-      });
-      document.getElementById('best-score').textContent = previousScores.length > 0 ? previousScores[0] : 0;
-    }
-
     document.getElementById('input-field').addEventListener('input', function(event) {
       if (!gameRunning) return; // Ignore input if the game is not running
       const typedWord = event.target.value.trim();
@@ -207,5 +208,6 @@
     startGame();
 
   </script>
+
 </body>
 </html>
