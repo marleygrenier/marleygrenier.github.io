@@ -84,7 +84,7 @@
   </div>
 
   <script>
-    let words = ["mai", "lundi", "avoir", "masculin", "etre", "dimanche", "voiture", "chat", "chien", "jouer", "musique", "soleil"]; // Add more words as needed
+    let words = ["mai", "lundi", "avoir", "masculin", "etre", "dimanche"]; // Add more words as needed
     let currentWordIndex = 0;
     let startTime;
     let endTime;
@@ -93,6 +93,7 @@
 
     function startGame() {
       shuffleArray(words); // Shuffle the words array
+      currentWordIndex = 0; // Reset currentWordIndex
       startTime = new Date();
       showWord();
       showNextWords();
@@ -109,9 +110,14 @@
 
     function showWord() {
       const word = words[currentWordIndex];
-      const nextWords = words.slice(currentWordIndex + 1, currentWordIndex + 4).join(' - ');
       const wordDisplay = document.getElementById('word-display');
-      wordDisplay.innerHTML = `${word} - <span class="next-words">${nextWords}</span>`;
+      wordDisplay.textContent = '';
+      word.split('').forEach((letter, index) => {
+        const span = document.createElement('span');
+        span.textContent = letter;
+        span.classList.add('letter');
+        wordDisplay.appendChild(span);
+      });
     }
 
     function updateTimer() {
@@ -177,6 +183,7 @@
     });
 
     startGame();
+
   </script>
 </body>
 </html>
